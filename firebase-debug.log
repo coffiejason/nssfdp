@@ -1,0 +1,46 @@
+[debug] [2021-03-05T05:11:45.033Z] ----------------------------------------------------------------------
+[debug] [2021-03-05T05:11:45.049Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\figur\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions
+[debug] [2021-03-05T05:11:45.049Z] CLI Version:   9.5.0
+[debug] [2021-03-05T05:11:45.049Z] Platform:      win32
+[debug] [2021-03-05T05:11:45.049Z] Node Version:  v12.16.3
+[debug] [2021-03-05T05:11:45.049Z] Time:          Thu Mar 04 2021 21:11:45 GMT-0800 (Pacific Standard Time)
+[debug] [2021-03-05T05:11:45.049Z] ----------------------------------------------------------------------
+[debug] [2021-03-05T05:11:45.049Z] 
+[debug] [2021-03-05T05:11:45.064Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-03-05T05:11:45.080Z] > authorizing via signed-in user
+[debug] [2021-03-05T05:11:45.080Z] [iam] checking project nssformdelivery for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2021-03-05T05:11:45.080Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2021-03-05T05:11:45.080Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2021-03-05T05:11:49.536Z] <<< HTTP RESPONSE 200 {"date":"Thu, 04 Mar 2021 21:07:08 GMT","expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","cache-control":"no-cache, no-store, max-age=0, must-revalidate","content-type":"application/json; charset=utf-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","server":"scaffolding on HTTPServer2","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2021-03-05T05:11:49.728Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/nssformdelivery:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2021-03-05T05:11:51.347Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Thu, 04 Mar 2021 21:07:10 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=634","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2021-03-05T05:11:51.362Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/nssformdelivery/serviceAccounts/nssformdelivery@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2021-03-05T05:11:53.482Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Thu, 04 Mar 2021 21:07:12 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] 
+[info] === Deploying to 'nssformdelivery'...
+[info] 
+[info] i  deploying functions 
+[info] Running command: npm --prefix "$RESOURCE_DIR" run lint
+[info] +  functions: Finished running predeploy script. 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[debug] [2021-03-05T05:12:17.199Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/nssformdelivery/services/cloudfunctions.googleapis.com  
+ 
+[debug] [2021-03-05T05:12:17.200Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/nssformdelivery/services/runtimeconfig.googleapis.com  
+ 
+[debug] [2021-03-05T05:12:17.202Z] >>> HTTP REQUEST GET https://serviceusage.googleapis.com/v1/projects/nssformdelivery/services/cloudbuild.googleapis.com  
+ 
+[debug] [2021-03-05T05:12:20.054Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Thu, 04 Mar 2021 21:07:38 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] +  functions: required API cloudfunctions.googleapis.com is enabled 
+[debug] [2021-03-05T05:12:20.577Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Thu, 04 Mar 2021 21:07:39 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[info] +  functions: required API cloudbuild.googleapis.com is enabled 
+[debug] [2021-03-05T05:12:21.578Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Thu, 04 Mar 2021 21:07:40 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2021-03-05T05:12:21.578Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/nssformdelivery/adminSdkConfig  
+ 
+[debug] [2021-03-05T05:12:43.881Z] Error: connect ETIMEDOUT 216.58.211.202:443
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1141:16)
+[error] 
+[error] Error: Server Error. connect ETIMEDOUT 216.58.211.202:443
