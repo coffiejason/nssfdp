@@ -208,6 +208,10 @@ app.get('/gettime',(req,res)=>{
   res.send({'result': current_hour+':'+current_minutes+':'+current_seconds})
 });
 
+app.get('/',(req,res)=>{
+	res.sendStatus(200)
+})
+
 //exports.app = functions.https.onRequest(app);
 
 const port = process.env.PORT || '5000';
