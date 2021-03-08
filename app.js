@@ -1,17 +1,9 @@
-const functions = require('firebase-functions');
 const express = require('express');
-var admin = require('firebase-admin');
 var cors = require('cors');
-
-var serviceAccount = require(__dirname+'/serviceAccountKey.json');
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://nssformdelivery-default-rtdb.firebaseio.com"
-});
+var mongo = require('mongodb'); 
+var MongoClient = require('mongodb').MongoClient;
 
 const app = express();
-var db = admin.database();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors());
@@ -25,179 +17,118 @@ var current_hour =  dateObj.getHours();
 var current_minutes = dateObj.getMinutes();
 var current_seconds =  dateObj.getSeconds();
 
-var assignedkeys = [];
-/*
-function generateKey(){
-  let key =  'NSS'+month+'0'+(String(Math.random()).substring(2,7));
-   
-  if(assignedkeys.includes(key))
+//connect to mongodb
+var url = "mongodb+srv://nssdeliverywebapp:gamegame@rest.woruh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
-  return
-}*/
+function register(record){
+
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      dbo.collection(String(month)).insertOne(record, function(err, res) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+        console.log("record inserted");
+        db.close();
+        resolve('success')
+      });
+    });
+  });
+
+}
+
+function lookup(query){
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      let ress = {};
+      dbo.collection(String(month)).find({}).toArray(function(err, result) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+        //console.log(result);
+
+        for(let val of result){
+          //console.log(val)
+          if(val.assigned_key === query || val.phone === query){
+            console.log(val)
+            ress = {
+              name: String(val.name),
+              district: String(val.district),
+              organization: String(val.organization),
+              phone: String(val.phone),
+              email: String(val.email),
+              assigned_key: String(val.assigned_key)
+            }
+      
+          }
+        }
+        db.close();
+        resolve(ress);
+      });
+    });
+
+  });
+}
+
+var assignedkeys = [];
 
 app.post('/register',async(req,res)=>{
 
-    console.log(req.body);
-    
-    var pushid = db.ref('users/'+year+'/'+month).push().getKey();
-    //MoMo Payment
+    //console.log(req.body);
 
-    //After momo payment
     var min = 1000;
     var max = 9999;
     var assigned_key =  'NSS'+month+'0'+(String(Math.random()).substring(2,7));
 
-    console.log(String(assigned_key));
-  
-    await db.ref('users/'+year+'/'+month).child(String(pushid)).set({
-        id: pushid,
-        name: req.body.name,
-        phone: req.body.phone,
-        email: req.body.email,
-        district: req.body.district,
-        organization: req.body.organization,
-        paymentreference: req.body.paymentreference,
-        assignedkey: assigned_key,
-        time: current_hour+':'+current_minutes+':'+current_seconds
-    }, async function(error) {
-      if (error) {
-        console.log(error);
-        res.sendStatus(500);
-      } else {
+    let record = {
+      "id": req.body.pushid,
+      "name": req.body.name,
+      "phone": req.body.phone,
+      "email": req.body.email,
+      "district": req.body.district,
+      "organization": req.body.organization,
+      "paymentreference": req.body.paymentreference,
+      "time": current_hour+':'+current_minutes+':'+current_seconds,
+      "assigned_key": assigned_key
+    };
+
+    register(record).then((value)=>{
+      console.log(value);
+      if(value === 'success'){
         res.send({
-          res: 200,
+          status: 200,
           assigned_key: assigned_key
         });
       }
+      else{
+        res.sendStatus(500);
+      }
     });
 
-    
-    res.send();
 });
 
 app.post('/lookup',async(req,res)=>{
-
-  const eventref = db.ref("users/"+year+"/"+month);
-  const snapshot = await eventref.once('value');
-  const value = snapshot.val();
-
-  var data = Object.entries(value);
-
-  var query = req.body.query;
-
-  for(let val of data){
-
-    var response;
-
-    if(query === String(val[1].assignedkey) || query === String(val[1].phone)){
-      
-      response = {
-        id: String(val[1].assignedkey),
-        name: String(val[1].name),
-        district: String(val[1].district),
-        organization: String(val[1].organization),
-        phone: String(val[1].phone),
-        paymentmethod: String(val[1].paymentmethod)
-      }
-
+  lookup(req.body.query).then((value)=>{
+    //console.log(value);
+    if(value === 'failed'){
+      res.sendStatus(500);
     }
-  }
-
-  res.send(response);
-
-});
-
-app.get('/verify_transaction/:reference',async(req,res)=>{
-
-  console.log(req.params.reference);
-
-  const options = {
-
-    hostname: 'api.paystack.co',
-
-    port: 443,
-
-    path: '/transaction/verify/'+req.params.reference,
-
-    method: 'GET',
-
-    headers: {
-
-      Authorization: ''
-
+    else{
+      res.send(value)
     }
-
-  }
-
-  https.request(options, res => {
-
-    let data = ''
-
-    resp.on('data', (chunk) => {
-
-      data += chunk
-
-    });
-
-    resp.on('end', () => {
-
-      console.log('1');
-      //res.send(JSON.parse(data))
-
-    })
-
-  }).on('error', error => {
-
-    console.error('0');
-    //res.send(error)
-
-  })
-  res.sendStatus(200);
-});
-
-app.get('/verify_transaction2/:reference',async(req,res)=>{
-
-  const options = {
-
-    hostname: 'api.paystack.co',
-  
-    port: 443,
-  
-    path: '/transaction/verify/:'+req.params.reference,
-
-    method: 'GET',
-
-    headers: {
-
-      Authorization: 'sk_live_0503c9bf4fc394674529dae02673cd4df8110f90'
-
-    }
-  
-  }
-  
-  https.request(options, res => {
-  
-    let data = ''
-  
-    resp.on('data', (chunk) => {
-  
-      data += chunk
-  
-    });
-  
-    resp.on('end', () => {
-  
-      console.log(JSON.parse(data))
-  
-    })
-  
-  }).on('error', error => {
-  
-    console.error(error)
-  
-  })
-
-  res.sendStatus(200);
+  });
 });
 
 app.get('/gettime',(req,res)=>{
@@ -210,19 +141,7 @@ app.get('/gettime',(req,res)=>{
 
 app.get('/',(req,res)=>{
 	res.sendStatus(200)
-})
-
-//exports.app = functions.https.onRequest(app);
+});
 
 const port = process.env.PORT || '5000';
 app.listen(port, () => console.log('Server started on port '+port));
-
-
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//   functions.logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
- 
