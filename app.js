@@ -2,6 +2,7 @@ const express = require('express');
 var cors = require('cors');
 var mongo = require('mongodb'); 
 var MongoClient = require('mongodb').MongoClient;
+var nodemailer = require('nodemailer');
 
 const app = express();
 app.use(express.json());
@@ -82,6 +83,37 @@ function lookup(query){
   });
 }
 
+async function sendMail(name, message){
+  return new Promise((resolve,reject)=>{
+
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'tipy.llc@gmail.com',
+        pass: 'Dzogbewu@1'
+      }
+    });
+    
+    var mailOptions = {
+      from: `Customer Complaint <tipy.llc@gmail.com>`,
+      to: 'coffiejasoncj@gmail.com',
+      subject: name,
+      text: message
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+        reject('failed');
+      } else {
+        console.log('Email sent: ' + info.response);
+        resolve('success');
+      }
+    }); 
+
+  });
+}
+
 var assignedkeys = [];
 
 app.post('/register',async(req,res)=>{
@@ -129,6 +161,18 @@ app.post('/lookup',async(req,res)=>{
       res.send(value)
     }
   });
+});
+
+app.post('/sendmail', async(req,res)=>{
+  sendMail(req.body.name,req.body.message).then((value)=>{
+    if(value === 'success'){
+      res.sendStatus(200);
+    }
+    else{
+      res.sendStatus(500);
+    }
+  })
+
 });
 
 app.get('/gettime',(req,res)=>{
