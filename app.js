@@ -95,7 +95,7 @@ async function sendMail(name, message){
     });
     
     var mailOptions = {
-      from: `Customer Complaint <tipy.llc@gmail.com>`,
+      from: 'tipy.llc@gmail.com',
       to: 'coffiejasoncj@gmail.com',
       subject: name,
       text: message
