@@ -164,6 +164,7 @@ app.post('/lookup',async(req,res)=>{
 });
 
 app.post('/sendmail', async(req,res)=>{
+  console.log('sending mail');
   sendMail(req.body.name,req.body.message).then((value)=>{
     if(value === 'success'){
       res.sendStatus(200);
