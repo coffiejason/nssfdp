@@ -44,6 +44,29 @@ function register(record){
 
 }
 
+function updateDnOs(DnOs){
+
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      dbo.collection('DnOs').insertMany(DnOs, function(err, res) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+        console.log("record inserted");
+        db.close();
+        resolve('success')
+      });
+    });
+  });
+
+}
+
 function lookup(query){
   return new Promise((resolve,reject)=>{
     MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
@@ -77,6 +100,29 @@ function lookup(query){
         }
         db.close();
         resolve(ress);
+      });
+    });
+
+  });
+}
+
+function getDnOs(district){
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      var query = { district: district };
+      dbo.collection('DnOs').find(query, { projection: { _id: 0, organization: 1, district: 1 }}).toArray(function(err, result) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+
+        db.close();
+        resolve(result);
       });
     });
 
@@ -174,6 +220,41 @@ app.post('/sendmail', async(req,res)=>{
     }
   })
 
+});
+
+app.post('/updateDnOs',async(req,res)=>{
+  let DnOs = [
+    {district: "La Nkwantanang", organization: "AAU (Associaction of African Universities)"},
+    {district: "La Nkwantanang", organization: "LANMMA (Municipal Assembly)"},
+    {district: "La Nkwantanang", organization: "NTCE (National Council for Tertiary Education)"},
+    {district: "La Nkwantanang", organization: "Pentecost Hospital"},
+    {district: "La Nkwantanang", organization: "UPSA"},
+    {district: "La Nkwantanang", organization: "PRESEC"},
+    {district: "La Nkwantanang", organization: "Pentecost Hospital"},
+    {district: "La Nkwantanang", organization: "UG (University of Ghana)"}
+  ];
+
+  updateDnOs(req.body.data).then((value)=>{
+    console.log(value);
+    if(value === 'success'){
+      res.sendStatus(200);
+    }
+    else{
+      res.sendStatus(500);
+    }
+  });
+});
+
+app.get('/getDnOs/:district', async(req,res)=>{
+  getDnOs(req.params.district).then((value)=>{
+    //console.log(value);
+    if(value === 'failed'){
+      res.sendStatus(500);
+    }
+    else{
+      res.send(value)
+    }
+  });
 });
 
 app.get('/gettime',(req,res)=>{
