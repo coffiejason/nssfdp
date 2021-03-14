@@ -67,6 +67,29 @@ function updateDnOs(DnOs){
 
 }
 
+function updateDepartments(departments){
+  
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      dbo.collection('Departments').insertMany(departments, function(err, res) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+        console.log("record inserted");
+        db.close();
+        resolve('success')
+      });
+    });
+  });
+
+}
+
 function lookup(query){
   return new Promise((resolve,reject)=>{
     MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
@@ -127,6 +150,30 @@ function getDnOs(district){
     });
 
   });
+}
+
+function getDepartments(organization){
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      var query = { organization: organization };
+      dbo.collection('Departments').find(query, { projection: { _id: 0, organization: 1, department: 1 }}).toArray(function(err, result) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+
+        db.close();
+        resolve(result);
+      });
+    });
+
+  });
+
 }
 
 async function sendMail(name, message){
@@ -223,16 +270,6 @@ app.post('/sendmail', async(req,res)=>{
 });
 
 app.post('/updateDnOs',async(req,res)=>{
-  let DnOs = [
-    {district: "La Nkwantanang", organization: "AAU (Associaction of African Universities)"},
-    {district: "La Nkwantanang", organization: "LANMMA (Municipal Assembly)"},
-    {district: "La Nkwantanang", organization: "NTCE (National Council for Tertiary Education)"},
-    {district: "La Nkwantanang", organization: "Pentecost Hospital"},
-    {district: "La Nkwantanang", organization: "UPSA"},
-    {district: "La Nkwantanang", organization: "PRESEC"},
-    {district: "La Nkwantanang", organization: "Pentecost Hospital"},
-    {district: "La Nkwantanang", organization: "UG (University of Ghana)"}
-  ];
 
   updateDnOs(req.body.data).then((value)=>{
     console.log(value);
@@ -241,6 +278,43 @@ app.post('/updateDnOs',async(req,res)=>{
     }
     else{
       res.sendStatus(500);
+    }
+  });
+});
+
+app.post('/updateDepartments', async(req,res)=>{
+  /*
+       "data" : [
+    { "organization": "UG (University of Ghana)", "department": "UG Business School"},
+    { "organization": "UG (University of Ghana)", "department": "UG Engineering School"},
+    { "organization": "UG (University of Ghana)", "department": "UG Law School"},
+    { "organization": "UG (University of Ghana)", "department": "UGCS Computing systems"},
+    { "organization": "UG (University of Ghana)", "department": "UG Balme Library"},
+    { "organization": "UG (University of Ghana)", "department": "UG Accounts Office"},
+    { "organization": "UG (University of Ghana)", "department": "UG Registry"}
+  ]
+  */
+
+  updateDepartments(req.body.data).then((value)=>{
+    console.log(value);
+    if(value === 'success'){
+      res.sendStatus(200);
+    }
+    else{
+      res.sendStatus(500);
+    }
+  });
+
+});
+
+app.get('/getDepartments/:organization', async(req,res)=>{
+  getDepartments(req.params.organization).then((value)=>{
+    //console.log(value);
+    if(value === 'failed'){
+      res.sendStatus(500);
+    }
+    else{
+      res.send(value)
     }
   });
 });
