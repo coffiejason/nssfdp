@@ -92,6 +92,8 @@ function updateDepartments(departments){
 
 function postpone(record){
   console.log("sdsjh");
+
+  record.date = day+'/'+month+'/'+year;
   
   return new Promise((resolve,reject)=>{
     MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
