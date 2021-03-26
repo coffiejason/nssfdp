@@ -1,8 +1,8 @@
 const express = require('express');
 var cors = require('cors');
-var mongo = require('mongodb'); 
 var MongoClient = require('mongodb').MongoClient;
 var nodemailer = require('nodemailer');
+const https = require('https');
 
 const app = express();
 app.use(express.json());
@@ -90,6 +90,30 @@ function updateDepartments(departments){
 
 }
 
+function postpone(record){
+  console.log("sdsjh");
+  
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      dbo.collection("Postpone").insertOne(record, function(err, res) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+        console.log("record inserted");
+        db.close();
+        resolve('success')
+      });
+    });
+  });
+
+}
+
 function lookup(query){
   return new Promise((resolve,reject)=>{
     MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
@@ -116,7 +140,8 @@ function lookup(query){
               organization: String(val.organization),
               phone: String(val.phone),
               email: String(val.email),
-              assigned_key: String(val.assigned_key)
+              assigned_key: String(val.assigned_key),
+              date: String(val.date)
             }
       
           }
@@ -226,6 +251,7 @@ app.post('/register',async(req,res)=>{
       "organization": req.body.organization,
       "paymentreference": req.body.paymentreference,
       "time": current_hour+':'+current_minutes+':'+current_seconds,
+      "date": day+'/'+month+'/'+year,
       "assigned_key": assigned_key
     };
 
@@ -307,6 +333,20 @@ app.post('/updateDepartments', async(req,res)=>{
 
 });
 
+app.post('/postpone', async(req,res)=>{
+
+  postpone(req.body.data).then((value)=>{
+    console.log(value);
+    if(value === 'success'){
+      res.sendStatus(200);
+    }
+    else{
+      res.sendStatus(500);
+    }
+  });
+
+});
+
 app.get('/getDepartments/:organization', async(req,res)=>{
   getDepartments(req.params.organization).then((value)=>{
     //console.log(value);
@@ -329,6 +369,55 @@ app.get('/getDnOs/:district', async(req,res)=>{
       res.send(value)
     }
   });
+});
+
+app.get('/verify_transaction/:reference',async(req,res)=>{
+
+  console.log(req.params.reference);
+
+  const options = {
+
+    hostname: 'api.paystack.co',
+
+    port: 443,
+
+    path: '/transaction/verify/'+req.params.reference,
+
+    method: 'GET',
+
+    headers: {
+
+      Authorization: "sk_live_0503c9bf4fc394674529dae02673cd4df8110f90"
+    }
+
+  }
+
+  https.request(options, resp => {
+
+    let data = ''
+
+    resp.on('data', (chunk) => {
+
+      data += chunk
+
+      console.log(data);
+
+    });
+
+    resp.on('end', () => {
+
+      console.log('1');
+      res.send(JSON.parse(data))
+
+    })
+
+  }).on('error', error => {
+
+    console.error('0');
+    res.send(error)
+
+  })
+  //res.sendStatus(200);
 });
 
 app.get('/gettime',(req,res)=>{
