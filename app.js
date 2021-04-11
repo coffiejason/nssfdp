@@ -90,6 +90,29 @@ function updateDepartments(departments){
 
 }
 
+function updateReps(reps){
+  
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      dbo.collection('Representative').insertMany(reps, function(err, res) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+        console.log("record inserted");
+        db.close();
+        resolve('success')
+      });
+    });
+  });
+
+}
+
 function postpone(record){
   console.log("sdsjh");
 
@@ -200,7 +223,29 @@ function getDepartments(organization){
     });
 
   });
+}
 
+function getReps(organization){
+  return new Promise((resolve,reject)=>{
+    MongoClient.connect(url,{useNewUrlParser: true, useUnifiedTopology: true},function(err, db) {
+      if (err){
+        console.log(err);
+        reject('failed');
+      };
+      var dbo = db.db("nssfdp");
+      var query = { organization: organization };
+      dbo.collection('Representative').find(query, { projection: { _id: 0, organization: 1, representative: 1 }}).toArray(function(err, result) {
+        if (err){
+          console.log(err)
+          reject('failed');
+        };
+
+        db.close();
+        resolve(result);
+      });
+    });
+
+  });
 }
 
 async function sendMail(name, message,phone,email){
@@ -335,6 +380,32 @@ app.post('/updateDepartments', async(req,res)=>{
 
 });
 
+app.post('/updateReps', async(req,res)=>{
+  /*
+       "data" : [
+    { "organization": "UG (University of Ghana)", "department": "UG Business School"},
+    { "organization": "UG (University of Ghana)", "department": "UG Engineering School"},
+    { "organization": "UG (University of Ghana)", "department": "UG Law School"},
+    { "organization": "UG (University of Ghana)", "department": "UGCS Computing systems"},
+    { "organization": "UG (University of Ghana)", "department": "UG Balme Library"},
+    { "organization": "UG (University of Ghana)", "department": "UG Accounts Office"},
+    { "organization": "UG (University of Ghana)", "department": "UG Registry"}
+  ]
+  */
+
+  updateReps(req.body.data).then((value)=>{
+    console.log(value);
+    if(value === 'success'){
+      res.sendStatus(200);
+    }
+    else{
+      res.sendStatus(500);
+    }
+  });
+
+});
+
+
 app.post('/postpone', async(req,res)=>{
 
   postpone(req.body.data).then((value)=>{
@@ -351,6 +422,18 @@ app.post('/postpone', async(req,res)=>{
 
 app.get('/getDepartments/:organization', async(req,res)=>{
   getDepartments(req.params.organization).then((value)=>{
+    //console.log(value);
+    if(value === 'failed'){
+      res.sendStatus(500);
+    }
+    else{
+      res.send(value)
+    }
+  });
+});
+
+app.get('/getReps/:organization', async(req,res)=>{
+  getReps(req.params.organization).then((value)=>{
     //console.log(value);
     if(value === 'failed'){
       res.sendStatus(500);
