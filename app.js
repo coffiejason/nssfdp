@@ -215,9 +215,9 @@ async function sendMail(name, message){
     });
     
     var mailOptions = {
-      from: 'mefdep@outlook.com',
+      from: `CUSTOMER REQUEST <mefdep@outlook.com>`,
       to: 'coffiejasoncj@gmail.com',
-      subject: name,
+      subject: name+' posted a request',
       text: message
     };
 
