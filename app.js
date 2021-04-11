@@ -218,7 +218,7 @@ async function sendMail(name, message,phone,email){
       from: `CUSTOMER REQUEST <mefdep@outlook.com>`,
       to: 'coffiejasoncj@gmail.com',
       subject: name+' posted a request',
-      text: message+' <br><br>'+'<strong>CONTACT: </strong>'+phone+' '+email
+      html: '<p>'+message+'</p> <br><br>'+'<strong>CONTACT: </strong>'+phone+' '+email
     };
 
     transporter.sendMail(mailOptions, function(error, info){
