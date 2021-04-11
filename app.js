@@ -207,15 +207,15 @@ async function sendMail(name, message){
   return new Promise((resolve,reject)=>{
 
     var transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: 'Outlook365',
       auth: {
-        user: 'tipy.llc@gmail.com',
+        user: 'mefdep@outlook.com',
         pass: 'Dzogbewu@1'
       }
     });
     
     var mailOptions = {
-      from: 'tipy.llc@gmail.com',
+      from: 'mefdep@outlook.com',
       to: 'coffiejasoncj@gmail.com',
       subject: name,
       text: message
