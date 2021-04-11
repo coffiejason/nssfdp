@@ -203,7 +203,7 @@ function getDepartments(organization){
 
 }
 
-async function sendMail(name, message){
+async function sendMail(name, message,phone,email){
   return new Promise((resolve,reject)=>{
 
     var transporter = nodemailer.createTransport({
@@ -218,7 +218,7 @@ async function sendMail(name, message){
       from: `CUSTOMER REQUEST <mefdep@outlook.com>`,
       to: 'coffiejasoncj@gmail.com',
       subject: name+' posted a request',
-      text: message
+      text: message+' <br><br>'+'<strong>CONTACT: </strong>'+phone+' '+email
     };
 
     transporter.sendMail(mailOptions, function(error, info){
@@ -286,7 +286,7 @@ app.post('/lookup',async(req,res)=>{
 
 app.post('/sendmail', async(req,res)=>{
   console.log('sending mail');
-  sendMail(req.body.name,req.body.message).then((value)=>{
+  sendMail(req.body.name,req.body.message,req.body.phone,req.body.email).then((value)=>{
     if(value === 'success'){
       res.sendStatus(200);
     }
